@@ -1,65 +1,90 @@
-import time
+# Filename: qn4.py
+# Author: Yang Shen 6C22
+
+from collections import OrderedDict
 
 def PRINTRECORD():
 
     try:
-        resource_file = open("RESOURCE.DAT", "r")
         uresource_file = open("URESOURCE.DAT", "r")
         loan_file = open("LOAN.DAT", "r")
-        report_file = open("REPORT.DAT", "w")
-
-        detail_lines = loan_file.readlines()
+        
+        loan_dict = {}
+        
         loan_list = []
         dates = []
+        end_list = []
+        end_end_list = []
 
-        for record_line in detail_lines:
-            loan_list_data = []
+        loan_details = loan_file.readlines()
+        resource_details = uresource_file.readlines()
+
+        for record_line in loan_details:
+            
             record_line = record_line.rstrip("\n")
             resource_no = record_line[:5]
-            student_id = record_line[5:11]
-            DateDueBack = record_line[41:47]
-            loan_list_data.append(record_line)
-            loan_list_data.append(resource_no)
-            loan_list_data.append(student_id)
-            loan_list.append(loan_list_data)
+            student_id = record_line[5:10]
+            student_name = record_line[10:40]
+            Day = record_line[40:42]
+            Month = record_line[42:44]
+            Year = record_line[44:46]
+            DateDueBack = Year + Month + Day
             
-            if DateDueBack == dates[record_line-1]:
-                continue
-            else:
+            if DateDueBack not in dates:
                 dates.append(DateDueBack)
-                
-                resource_num = 0
-                count = 0
-                i = 0
-                j = 0
-		
-                while i <= length.loan_list():
-                    loan_file.write("Date: " + loan_list[i][3])
-                    while loan_list[i][3] < loan_list[i+1][3]:
-                        loan_file.write(loan_list[i][0])
-                        loan_file.write(loan_list[i][1])
-                        loan_file.write(loan_list[i][2])
-                        i = i + 1			
-                        i = i + 1
-			
-        new_lines = resource_file.readlines()
-        
-        for data_line in new_lines:
 
-            data_line = data_line.rstrip("\n")
-            new_resource_no = data_line[:5]
-                
-        print("-" * 75)
-        print(loan_list)
+            for record_line_two in resource_details:
+                record_line_two = record_line_two.rstrip("\n")
+
+                if resource_no == record_line_two[:5]:
+                    resource_title = record_line_two[5:35]
+                    resource_type = record_line[41:]
+
+                    if resource_type == "C":
+                        resource_type = "CD"
+                    else:
+                        resource_type = "DVD"
+                    break
+                else:
+                    continue
+
+            loan_list = [DateDueBack, resource_no, resource_title, resource_type, student_id, student_name]
+            
+            end_list.append(loan_list)
+            
+            loan_list = list()
+            
+        for date in dates:
+            for loan in end_list:
+                if date == loan[0]:
+                    del loan[0]
+                    end_end_list.append(loan)
+                        
+            loan_dict[date] = end_end_list
+
+            end_end_list = list()
+        sorted_loan_dict = OrderedDict(sorted(loan_dict.items(), key=lambda t: t[0]))
+        for k, v in sorted_loan_dict.items():
+            print("Date: " + k[4:6] + "-" + k[2:4] + "-" + "20" + k[:2])
+            print("-" * 75)
+            print()
+            for i in range(len(v)):
+                for j in range(len(v[i])):
+                    print(v[i][j], end = " ")
+                print()
+            print("Number of Resources: ",len(v))
+            print()
         
         ## close files
-        resource_file.close()
+        uresource_file.close()
         loan_file.close()
-        report_file.close()
 
     except IOError:
 
         print("Error! Input file does not exist.")
+
+if __name__ == "__main__":
+    PRINTRECORD()
 
 ##from collections import OrderedDict
 ##
